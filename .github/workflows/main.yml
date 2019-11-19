@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  DATABASE_URL: "mssql://SA:MyPassword42@localhost:1433/default?isolation_level=read committed&driver=ODBC Driver 17 for SQL Server"
+  DATABASE_URL_OTHER: "mssql://SA:MyPassword42@localhost:1433/other?isolation_level=read committed&driver=ODBC Driver 17 for SQL Server"
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+      - name: Linting
+        run: |
+          flake8
+
+  build:
+    runs-on: ${{ matrix.os }}
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: MyPassword42
+        ports:
+          - 1433:1433
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        tox_env:
+          - "py36-django22"
+          - "py36-django30"
+
+          - "py37-django22"
+          - "py37-django30"
+
+          - "py38-django30"
+
+        include:
+          - python: "3.6"
+            tox_env: "py36-django22"
+
+          - python: "3.6"
+            tox_env: "py36-django30"
+
+          - python: "3.7"
+            tox_env: "py37-django22"
+
+          - python: "3.7"
+            tox_env: "py37-django30"
+
+          - python: "3.8"
+            tox_env: "py38-django30"
+
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 g++ unixodbc-dev libmemcached-dev
+
+          python -m pip install --upgrade pip wheel setuptools
+          pip install tox tox-venv
+          git clone https://github.com/django/django.git
+
+      - name: Test
+        run: |
+          tox -e ${{ matrix.tox_env }}

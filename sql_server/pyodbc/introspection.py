@@ -2,7 +2,7 @@ import pyodbc as Database
 from collections import namedtuple
 
 from django.db.backends.base.introspection import (
-    BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
+    BaseDatabaseIntrospection, TableInfo,
 )
 from django.db.models.indexes import Index
 

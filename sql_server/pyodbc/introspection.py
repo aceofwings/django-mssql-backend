@@ -9,7 +9,8 @@ from django.db.models.indexes import Index
 SQL_AUTOFIELD = -777555
 SQL_BIGAUTOFIELD = -777444
 
-FieldInfo = namedtuple('FieldInfo','name type_code display_size internal_size precision scale null_ok default')
+FieldInfo = namedtuple('FieldInfo', 'name type_code display_size internal_size precision scale null_ok default')
+
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Map type codes to Django Field types.

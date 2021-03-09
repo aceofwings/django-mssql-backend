@@ -5,7 +5,7 @@ from django.utils.functional import cached_property
 class DatabaseFeatures(BaseDatabaseFeatures):
     can_introspect_json_field = False
     has_native_json_field = False
-    has_native_uuid_field = False
+    has_native_uuid_field = True
     allow_sliced_subqueries_with_in = False
     can_introspect_autofield = True
     can_introspect_small_integer_field = True

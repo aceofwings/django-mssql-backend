@@ -95,7 +95,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'SmallIntegerField': 'smallint',
         'TextField': 'nvarchar(max)',
         'TimeField': 'time',
-        'UUIDField': 'char(32)',
+        'UUIDField': 'uniqueidentifier',
         'JSONField': 'nvarchar(max)',
     }
     data_type_check_constraints = {
